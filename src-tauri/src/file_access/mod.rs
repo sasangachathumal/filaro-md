@@ -5,9 +5,10 @@
 pub mod commands;
 mod error;
 mod model;
+mod recent;
 mod walk;
 
 #[allow(unused_imports)]
 pub use error::FileAccessError;
 #[allow(unused_imports)]
-pub use model::MarkdownEntry;
+pub use model::{MarkdownEntry, RecentEntry};

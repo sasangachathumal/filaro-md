@@ -10,6 +10,7 @@ pub enum FileAccessError {
     Dialog(String),
     NotMarkdown { path: String },
     NotADirectory { path: String },
+    Config(String),
 }
 
 impl fmt::Display for FileAccessError {
@@ -25,6 +26,7 @@ impl fmt::Display for FileAccessError {
             FileAccessError::NotADirectory { path } => {
                 write!(f, "\"{path}\" is not a directory")
             }
+            FileAccessError::Config(message) => write!(f, "config error: {message}"),
         }
     }
 }

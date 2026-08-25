@@ -16,6 +16,8 @@ pub fn run() {
             file_access::commands::open_markdown_file,
             file_access::commands::open_markdown_folder,
             file_access::commands::read_markdown_file,
+            file_access::commands::read_recent_files,
+            file_access::commands::write_recent_files,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

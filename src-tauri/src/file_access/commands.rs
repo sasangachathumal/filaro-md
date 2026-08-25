@@ -1,11 +1,15 @@
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
+use tauri::Manager;
 use tauri_plugin_dialog::DialogExt;
 
 use super::error::FileAccessError;
-use super::model::MarkdownEntry;
+use super::model::{MarkdownEntry, RecentEntry};
+use super::recent;
 use super::walk::walk_markdown_folder;
+
+const RECENT_FILES_CONFIG_FILE: &str = "recent-files.json";
 
 const MARKDOWN_EXTENSIONS: &[&str] = &["md", "markdown"];
 
@@ -72,4 +76,27 @@ pub fn read_markdown_file(path: String) -> Result<String, FileAccessError> {
         path: path.display().to_string(),
         source,
     })
+}
+
+fn recent_config_path(app: &tauri::AppHandle) -> Result<PathBuf, FileAccessError> {
+    app.path()
+        .app_config_dir()
+        .map(|dir| dir.join(RECENT_FILES_CONFIG_FILE))
+        .map_err(|source| FileAccessError::Config(source.to_string()))
+}
+
+/// Reads the persisted recent-files list. A missing or corrupt config
+/// file yields an empty list rather than an error.
+#[tauri::command]
+pub fn read_recent_files(app: tauri::AppHandle) -> Result<Vec<RecentEntry>, FileAccessError> {
+    recent::read_recent_files(&recent_config_path(&app)?)
+}
+
+/// Overwrites the persisted recent-files list with `paths` (most-recent-first).
+/// Directories are dropped, duplicates collapse to their frontmost
+/// occurrence, and the list is capped, dropping the oldest entries — see
+/// [`recent::write_recent_files`].
+#[tauri::command]
+pub fn write_recent_files(app: tauri::AppHandle, paths: Vec<String>) -> Result<(), FileAccessError> {
+    recent::write_recent_files(&recent_config_path(&app)?, &paths)
 }

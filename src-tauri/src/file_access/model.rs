@@ -12,3 +12,13 @@ pub struct MarkdownEntry {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub children: Option<Vec<MarkdownEntry>>,
 }
+
+/// One entry in the persisted recent-files list, enriched at read time
+/// with whether the file is still present on disk.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RecentEntry {
+    pub name: String,
+    pub path: String,
+    pub exists: bool,
+}

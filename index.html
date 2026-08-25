@@ -10,14 +10,20 @@
 
   <body>
     <div class="app">
-      <header class="toolbar">
-        <button id="open-file-button" type="button">Open Markdown File…</button>
-        <span id="status" class="status" role="status"></span>
-      </header>
+      <div class="layout">
+        <aside id="sidebar-root" class="sidebar" aria-label="Files"></aside>
 
-      <main id="preview-root" class="preview" aria-live="polite">
-        <p class="empty-state">Open a markdown file to preview it here.</p>
-      </main>
+        <div class="main">
+          <header class="toolbar">
+            <button id="open-file-button" type="button">Open Markdown File…</button>
+            <span id="status" class="status" role="status"></span>
+          </header>
+
+          <main id="preview-root" class="preview" aria-live="polite">
+            <p class="empty-state">Open a markdown file to preview it here.</p>
+          </main>
+        </div>
+      </div>
     </div>
   </body>
 </html>
