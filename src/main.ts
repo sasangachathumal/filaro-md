@@ -1,22 +1,28 @@
-import { invoke } from "@tauri-apps/api/core";
-
-let greetInputEl: HTMLInputElement | null;
-let greetMsgEl: HTMLElement | null;
-
-async function greet() {
-  if (greetMsgEl && greetInputEl) {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    greetMsgEl.textContent = await invoke("greet", {
-      name: greetInputEl.value,
-    });
-  }
-}
+import { openMarkdownFile, readMarkdownFile } from "./file-access";
+import { MarkdownPreview } from "./markdown-preview";
 
 window.addEventListener("DOMContentLoaded", () => {
-  greetInputEl = document.querySelector("#greet-input");
-  greetMsgEl = document.querySelector("#greet-msg");
-  document.querySelector("#greet-form")?.addEventListener("submit", (e) => {
-    e.preventDefault();
-    greet();
+  const openButton = document.querySelector<HTMLButtonElement>("#open-file-button")!;
+  const statusEl = document.querySelector<HTMLElement>("#status")!;
+  const previewRoot = document.querySelector<HTMLElement>("#preview-root")!;
+
+  const preview = new MarkdownPreview(previewRoot);
+
+  openButton.addEventListener("click", async () => {
+    statusEl.textContent = "";
+    openButton.disabled = true;
+
+    try {
+      const path = await openMarkdownFile();
+      if (path === null) {
+        return;
+      }
+      const content = await readMarkdownFile(path);
+      preview.setContent(content);
+    } catch (error) {
+      statusEl.textContent = String(error);
+    } finally {
+      openButton.disabled = false;
+    }
   });
 });

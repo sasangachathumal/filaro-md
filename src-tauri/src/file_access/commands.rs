@@ -18,8 +18,12 @@ fn is_markdown_path(path: &Path) -> bool {
 
 /// Opens the native "open file" dialog filtered to markdown files.
 /// Returns `None` if the user cancels the dialog.
+///
+/// Must stay `async`: the blocking dialog call below hands the actual
+/// panel off to the main thread and waits on it, so this command has to
+/// run off the main thread itself or the two deadlock each other.
 #[tauri::command]
-pub fn open_markdown_file(app: tauri::AppHandle) -> Result<Option<String>, FileAccessError> {
+pub async fn open_markdown_file(app: tauri::AppHandle) -> Result<Option<String>, FileAccessError> {
     let Some(picked) = app
         .dialog()
         .file()
@@ -38,8 +42,10 @@ pub fn open_markdown_file(app: tauri::AppHandle) -> Result<Option<String>, FileA
 
 /// Opens the native "open folder" dialog, then walks the chosen folder for
 /// markdown files. Returns `None` if the user cancels the dialog.
+///
+/// Must stay `async` for the same reason as [`open_markdown_file`].
 #[tauri::command]
-pub fn open_markdown_folder(app: tauri::AppHandle) -> Result<Option<MarkdownEntry>, FileAccessError> {
+pub async fn open_markdown_folder(app: tauri::AppHandle) -> Result<Option<MarkdownEntry>, FileAccessError> {
     let Some(picked) = app.dialog().file().blocking_pick_folder() else {
         return Ok(None);
     };
