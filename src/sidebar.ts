@@ -1,3 +1,5 @@
+import { displayLocation } from "./path-display";
+
 /** The file currently shown in the preview pane. */
 export interface CurrentFile {
   name: string;
@@ -14,6 +16,8 @@ export interface RecentFileEntry {
 export interface SidebarProps {
   currentFile: CurrentFile | null;
   recentFiles: RecentFileEntry[];
+  /** Used to shorten locations to e.g. "Downloads"; `null` shows full folder paths. */
+  homeDir: string | null;
   onSelectRecent: (path: string) => void;
 }
 
@@ -61,6 +65,7 @@ export class Sidebar {
     const name = document.createElement("span");
     name.className = "sidebar-item-name";
     name.textContent = currentFile.name;
+    name.title = currentFile.name;
     item.appendChild(name);
 
     section.appendChild(item);
@@ -106,14 +111,18 @@ export class Sidebar {
       content.addEventListener("click", () => this.props.onSelectRecent(entry.path));
     }
 
+    // Name and location lines are each truncated with an ellipsis; hovering
+    // the name shows it in full, hovering the location shows the full path.
     const name = document.createElement("span");
     name.className = "sidebar-item-name";
     name.textContent = entry.name;
+    name.title = entry.name;
     content.appendChild(name);
 
     const path = document.createElement("span");
     path.className = "sidebar-item-path";
-    path.textContent = entry.path;
+    path.textContent = displayLocation(entry.path, this.props.homeDir);
+    path.title = entry.path;
     content.appendChild(path);
 
     if (!entry.exists) {

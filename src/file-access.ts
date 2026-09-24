@@ -1,4 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
+import { homeDir } from "@tauri-apps/api/path";
 
 /**
  * Thin wrapper around the Rust file-access commands. This is the only
@@ -21,6 +22,11 @@ export function openMarkdownFile(): Promise<string | null> {
 /** Reads a markdown file's contents as UTF-8 text. */
 export function readMarkdownFile(path: string): Promise<string> {
   return invoke<string>("read_markdown_file", { path });
+}
+
+/** The current user's home folder, e.g. `/Users/sam` or `C:\Users\sam`. */
+export function getHomeDir(): Promise<string> {
+  return homeDir();
 }
 
 /** Reads the persisted recent-files list (missing/corrupt config -> empty list). */
